@@ -1,0 +1,56 @@
+
+name: Build IDROK AI APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get project
+        uses: actions/checkout@v4
+
+      - name: Extract ZIP
+        run: unzip -o "idrok-ai-apk (1).zip"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install dependencies
+        working-directory: idrok-ai-apk
+        run: npm install
+
+      - name: Create Android project
+        working-directory: idrok-ai-apk
+        run: npx cap add android
+
+      - name: Sync Android
+        working-directory: idrok-ai-apk
+        run: npx cap sync android
+
+      - name: Build APK
+        working-directory: idrok-ai-apk
+        run: |
+          chmod +x android/gradlew
+          cd android
+          ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: IDROK-AI-APK
+          path: idrok-ai-apk/android/app/build/outputs/apk/debug/app-debug.apk
+          
