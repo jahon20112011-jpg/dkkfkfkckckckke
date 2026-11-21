@@ -2,7 +2,6 @@
 name: Build IDROK AI APK
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
@@ -16,7 +15,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Extract ZIP
-        run: unzip -o "idrok-ai-apk (1).zip"
+        run: unzip -o "idrok-ai-apk.zip"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -30,22 +29,24 @@ jobs:
           java-version: 17
 
       - name: Install dependencies
-        working-directory: idrok-ai-apk
-        run: npm install
+        run: |
+          cd idrok-ai-apk
+          npm install
 
       - name: Create Android project
-        working-directory: idrok-ai-apk
-        run: npx cap add android
+        run: |
+          cd idrok-ai-apk
+          npx cap add android
 
       - name: Sync Android
-        working-directory: idrok-ai-apk
-        run: npx cap sync android
+        run: |
+          cd idrok-ai-apk
+          npx cap sync android
 
       - name: Build APK
-        working-directory: idrok-ai-apk
         run: |
-          chmod +x android/gradlew
-          cd android
+          cd idrok-ai-apk/android
+          chmod +x gradlew
           ./gradlew assembleDebug
 
       - name: Upload APK
